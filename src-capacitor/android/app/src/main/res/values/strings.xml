@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Workout Lingo</string>
+    <string name="title_activity_main">Workout Lingo</string>
+    <string name="package_name">com.portersevertson.workoutlingo</string>
+    <string name="custom_url_scheme">com.portersevertson.workoutlingo</string>
+</resources>
