@@ -1,47 +1,37 @@
 <template>
-  <q-page class="row items-center justify-evenly">
-    <example-component
-      title="Example component"
-      active
-      :todos="todos"
-      :meta="meta"
-    ></example-component>
+  <q-page>
+    <div class="absolute-center column q-gutter-y-lg">
+      <div class="text-h3 text-center">{{ workoutWord }}</div>
+      <q-btn color="secondary" label="Randomize" @click="randomizeWord" />
+
+      <div class="text-subtitle1 text-center">
+        Setup your workout plan before you can begin
+      </div>
+      <q-btn color="secondary" label="Configure" @click="configure" />
+    </div>
   </q-page>
 </template>
 
 <script setup lang="ts">
+import { Dialog } from 'quasar';
 import { ref } from 'vue';
-import { Todo, Meta } from 'components/models';
-import ExampleComponent from 'components/ExampleComponent.vue';
+import ConfigureDialog from 'pages/ConfigureDialog.vue';
+import { generate } from 'random-words';
 
-defineOptions({
-  name: 'IndexPage'
-});
+const workoutWord = ref('');
 
-const todos = ref<Todo[]>([
-  {
-    id: 1,
-    content: 'ct1'
-  },
-  {
-    id: 2,
-    content: 'ct2'
-  },
-  {
-    id: 3,
-    content: 'ct3'
-  },
-  {
-    id: 4,
-    content: 'ct4'
-  },
-  {
-    id: 5,
-    content: 'ct5'
-  }
-]);
+function configure() {
+  Dialog.create({
+    component: ConfigureDialog,
+  });
+}
 
-const meta = ref<Meta>({
-  totalCount: 1200
-});
+function randomizeWord() {
+  workoutWord.value = generate({
+    exactly: 1,
+    minLength: 7,
+    maxLength: 10,
+    formatter: (word) => word.toUpperCase(),
+  })[0];
+}
 </script>
