@@ -14,7 +14,7 @@
         <div class="column q-gutter-y-xs">
           <div class="row q-gutter-x-sm">
             <q-select class="col" label="Units" :rules="[(v: string) => !!v]" lazy-rules="ondemand" outlined v-model="data.unit" emit-value map-options dense :options="unitOptions" />
-            <q-input class="col" label="Amount" :rules="[(v: number) => v > 0]" lazy-rules="ondemand" outlined v-model.number="data.quantity" dense />
+            <q-input class="col" label="Amount" :rules="[(v: number) => v >= 1]" lazy-rules="ondemand" outlined v-model.number="data.quantity" dense />
           </div>
         </div>
 
