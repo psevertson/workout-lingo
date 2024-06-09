@@ -4,9 +4,7 @@
       <div class="text-h3 text-center">{{ workoutWord }}</div>
       <q-btn color="secondary" label="Randomize" @click="randomizeWord" />
 
-      <div class="text-subtitle1 text-center">
-        Setup your workout plan before you can begin
-      </div>
+      <div class="text-subtitle1 text-center">Setup your workout plan before you can begin</div>
       <q-btn color="secondary" label="Configure" @click="configure" />
     </div>
   </q-page>
