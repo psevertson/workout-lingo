@@ -65,4 +65,5 @@ export const useAlphabetStore = defineStore('alphabet', {
         quantity: 0,
       })) as Workout[],
   }),
+  persist: true,
 });
