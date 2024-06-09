@@ -11,9 +11,9 @@
       <q-page-container>
         <q-page>
           <q-list separator>
-            <q-item v-for="(letter, index) in alphabet" :key="letter" clickable>
+            <q-item v-for="(letter, index) in alphabet" :key="letter" clickable @click="editLetter(index)">
               <q-item-section class="text-h5">{{ letter }}</q-item-section>
-              <q-item-section side>{{ index }} Push-ups</q-item-section>
+              <q-item-section side>{{ getExercise(index) }}</q-item-section>
             </q-item>
           </q-list>
         </q-page>
@@ -31,8 +31,11 @@
 </template>
 
 <script setup lang="ts">
-import { useDialogPluginComponent } from 'quasar';
-import { alphabet } from 'stores/alphabetStore';
+import { Dialog, useDialogPluginComponent } from 'quasar';
+import { alphabet, useAlphabetStore, type Workout } from 'stores/alphabetStore';
+import EditLetter from 'pages/EditLetter.vue';
+
+const alphabetStore = useAlphabetStore();
 
 defineEmits([...useDialogPluginComponent.emits]);
 
@@ -43,5 +46,29 @@ const { dialogRef, onDialogHide, onDialogOK } =
 
 function save() {
   onDialogOK();
+}
+
+function editLetter(index: number) {
+  Dialog.create({
+    component: EditLetter,
+    componentProps: {
+      index,
+      workout: alphabetStore.workouts[index],
+    },
+  }).onOk((workout: Workout) => {
+    alphabetStore.$patch((state) => {
+      state.workouts[index] = workout;
+    });
+  });
+}
+
+function getExercise(index: number) {
+  const workout = alphabetStore.workouts[index];
+  if (workout.type) {
+    const units = workout.unit === 'seconds' ? 'sec' : '';
+    return `${workout.quantity} ${units} ${workout.label}`;
+  } else {
+    return '(Empty)';
+  }
 }
 </script>
