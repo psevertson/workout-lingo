@@ -1,4 +1,3 @@
-@ -0,0 +1,45 @@
 <template>
   <q-dialog ref="dialogRef" maximized @hide="onDialogHide">
     <q-layout view="hHh lpR fFf" container class="bg-white text-dark">
