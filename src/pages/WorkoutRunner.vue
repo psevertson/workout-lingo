@@ -4,7 +4,7 @@
       <q-header elevated class="bg-primary">
         <q-toolbar>
           <q-toolbar-title class="text-center text-uppercase">
-            <span class="text-h3 text-green">{{ completedStr }}</span>
+            <span class="text-h3 text-accent">{{ completedStr }}</span>
             <span class="text-h3 text-bold text-white">{{ currentStr }}</span>
             <span class="text-h3 text-grey">{{ nextStr }}</span>
           </q-toolbar-title>
@@ -16,7 +16,17 @@
           <div class="absolute-center column q-gutter-y-lg text-center">
             <template v-if="currentExercise">
               <div class="text-h3">{{ currentExercise.label }}</div>
-              <div class="text-h5">{{ currentExercise.quantity }} {{ currentExercise.unit === 'seconds' ? 'Seconds' : 'Reps' }}</div>
+
+              <template v-if="currentExercise.unit === 'seconds'">
+                <vue-countdown ref="timerRef" class="text-h5" :auto-start="false" :key="step" :time="currentExercise.quantity * 1000" :interval="10" v-slot="{ seconds, milliseconds }" @end="endTimer"> {{ seconds }}.{{ Math.floor(milliseconds / 10) }}</vue-countdown>
+                <div class="text-h5 q-mt-none">Seconds</div>
+                <q-btn v-if="!timerStarted" color="secondary" label="Start Timer" @click="startTimer" />
+              </template>
+              <template v-else>
+                <div class="text-h5">{{ currentExercise.quantity }}</div>
+                <div class="text-h5 q-mt-none">Reps</div>
+              </template>
+              <q-btn color="secondary" :disable="!nextEnabled" :label="isCompleted ? 'Done' : 'Next'" @click="incrementStep" />
             </template>
             <template v-else>
               <div class="text-h3">Congrats!</div>
@@ -25,7 +35,7 @@
           </div>
 
           <div class="absolute-bottom text-center q-my-md">
-            <q-btn color="accent" :label="isCompleted ? 'Done' : 'Next'" @click="incrementStep" />
+            <q-btn color="accent" label="End Workout" @click="onDialogCancel" />
           </div>
         </q-page>
       </q-page-container>
@@ -37,6 +47,7 @@
 import { ref, computed } from 'vue';
 import { useDialogPluginComponent } from 'quasar';
 import { alphabet, useAlphabetStore } from 'stores/alphabetStore';
+import VueCountdown from '@chenfengyuan/vue-countdown';
 
 const alphabetStore = useAlphabetStore();
 
@@ -46,9 +57,13 @@ const props = defineProps<{
   workoutWord: string;
 }>();
 
-const { dialogRef, onDialogHide, onDialogOK } = useDialogPluginComponent();
+const { dialogRef, onDialogHide, onDialogOK, onDialogCancel } = useDialogPluginComponent();
 
 const step = ref<number>(0);
+const timerStarted = ref(false);
+const timerDone = ref(false);
+
+const timerRef = ref<InstanceType<typeof VueCountdown>>();
 
 const stepString = computed<[string, number][]>(() => {
   return props.workoutWord.split('').map((letter, index, arr) => {
@@ -86,7 +101,22 @@ function incrementStep() {
     onDialogOK();
   }
   step.value++;
+  timerDone.value = false;
+  timerStarted.value = false;
 }
+
+function startTimer() {
+  timerRef.value!.start();
+  timerStarted.value = true;
+}
+
+function endTimer() {
+  timerDone.value = true;
+}
+
+const nextEnabled = computed(() => {
+  return !(currentExercise.value?.unit === 'seconds' && !timerDone.value);
+});
 
 const currentExercise = computed(() => {
   const letterIndex = alphabet.findIndex((l) => l === currentStr.value.toUpperCase());

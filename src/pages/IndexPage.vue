@@ -3,8 +3,8 @@
     <div class="absolute-center column q-gutter-y-lg">
       <template v-if="setupCompleted">
         <div class="text-subtitle1 text-center">Enter a Word for your Workout</div>
-        <q-input input-class="text-center text-uppercase" outlined v-model="workoutWord" @keypress="checkKeyPress" />
-        <q-btn color="secondary" label="Random" @click="randomizeWord" />
+        <q-input autofocus input-class="text-center text-uppercase" outlined v-model="workoutWord" @keypress="checkKeyPress" />
+        <q-btn color="secondary" label="Random Word" @click="randomizeWord" />
         <q-btn color="accent" label="Begin Workout" :disable="!workoutWord.trim()" @click="startWorkout" />
       </template>
       <template v-else>
