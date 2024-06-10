@@ -4,9 +4,9 @@
       <q-header elevated class="bg-primary">
         <q-toolbar>
           <q-toolbar-title class="text-center text-uppercase">
-            <span class="text-h3 text-accent">{{ completedStr }}</span>
-            <span class="text-h3 text-bold text-white">{{ currentStr }}</span>
-            <span class="text-h3 text-grey">{{ nextStr }}</span>
+            <span class="text-h5 text-accent">{{ completedStr }}</span>
+            <span class="text-h5 text-bold text-white">{{ currentStr }}</span>
+            <span class="text-h5 text-grey">{{ nextStr }}</span>
           </q-toolbar-title>
         </q-toolbar>
       </q-header>
@@ -18,7 +18,7 @@
               <div class="text-h3">{{ currentExercise.label }}</div>
 
               <template v-if="currentExercise.unit === 'seconds'">
-                <vue-countdown ref="timerRef" class="text-h5" :auto-start="false" :key="step" :time="currentExercise.quantity * 1000" :interval="10" v-slot="{ seconds, milliseconds }" @end="endTimer"> {{ seconds }}.{{ Math.floor(milliseconds / 10) }}</vue-countdown>
+                <vue-countdown ref="timerRef" class="text-h5" :auto-start="false" :key="step" :time="currentExercise.quantity * 1000" :interval="10" v-slot="{ seconds, milliseconds }" @end="endTimer"> {{ seconds }}.{{ Math.floor(milliseconds / 10).toLocaleString(undefined, { minimumIntegerDigits: 2 }) }}</vue-countdown>
                 <div class="text-h5 q-mt-none">Seconds</div>
                 <q-btn v-if="!timerStarted" color="secondary" label="Start Timer" @click="startTimer" />
               </template>
@@ -26,16 +26,17 @@
                 <div class="text-h5">{{ currentExercise.quantity }}</div>
                 <div class="text-h5 q-mt-none">Reps</div>
               </template>
-              <q-btn color="secondary" :disable="!nextEnabled" :label="isCompleted ? 'Done' : 'Next'" @click="incrementStep" />
+              <q-btn color="secondary" :disable="!nextEnabled" label="Next" @click="incrementStep" />
             </template>
             <template v-else>
               <div class="text-h3">Congrats!</div>
               <div class="text-h5">You completed your workout</div>
+              <q-btn color="secondary" label="Done" @click="onDialogOK" />
             </template>
           </div>
 
           <div class="absolute-bottom text-center q-my-md">
-            <q-btn color="accent" label="End Workout" @click="onDialogCancel" />
+            <q-btn color="accent" label="End Workout" @click="endWorkout" />
           </div>
         </q-page>
       </q-page-container>
@@ -45,7 +46,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-import { useDialogPluginComponent } from 'quasar';
+import { Dialog, useDialogPluginComponent } from 'quasar';
 import { alphabet, useAlphabetStore } from 'stores/alphabetStore';
 import VueCountdown from '@chenfengyuan/vue-countdown';
 
@@ -92,14 +93,7 @@ const nextStr = computed(() => {
     .join('');
 });
 
-const isCompleted = computed(() => {
-  return !currentStr.value;
-});
-
 function incrementStep() {
-  if (isCompleted.value) {
-    onDialogOK();
-  }
   step.value++;
   timerDone.value = false;
   timerStarted.value = false;
@@ -112,6 +106,16 @@ function startTimer() {
 
 function endTimer() {
   timerDone.value = true;
+}
+
+function endWorkout() {
+  Dialog.create({
+    title: 'End Workout?',
+    message: 'You will lose all your current progress.',
+    cancel: true,
+  }).onOk(() => {
+    onDialogCancel();
+  });
 }
 
 const nextEnabled = computed(() => {

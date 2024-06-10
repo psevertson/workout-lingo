@@ -2,19 +2,11 @@
   <q-dialog ref="dialogRef" persistent @hide="onDialogHide">
     <q-card class="q-dialog-plugin">
       <q-form class="q-ma-md" greedy @submit="save">
-        <div class="row items-start q-gutter-x-sm">
-          <q-avatar color="secondary" text-color="white" size="xl">{{ alphabet[index] }}</q-avatar>
-          <div class="col column">
-            <q-select autofocus :rules="[(v: string) => !!v]" lazy-rules="ondemand" label="Exercise" outlined :modelValue="data.type" dense :options="typeOptions" map-options @update:modelValue="updateType" />
-            <q-input v-if="data.type === 'custom'" :rules="[(v: string) => !!v]" lazy-rules="ondemand" label="Exercise Name" outlined v-model="data.label" dense />
-          </div>
-        </div>
-
-        <div class="column q-gutter-y-xs">
-          <div class="row q-gutter-x-sm">
-            <q-select class="col" label="Units" :rules="[(v: string) => !!v]" lazy-rules="ondemand" outlined v-model="data.unit" emit-value map-options dense :options="unitOptions" />
-            <q-input class="col" label="Amount" :rules="[(v: number) => v >= 1]" lazy-rules="ondemand" outlined v-model.number="data.quantity" dense />
-          </div>
+        <div class="col column">
+          <q-avatar class="q-mx-auto q-mb-md" color="secondary" text-color="white" size="80px">{{ alphabet[index] }}</q-avatar>
+          <q-select autofocus :rules="[(v: string) => !!v]" lazy-rules="ondemand" label="Exercise" outlined :modelValue="data.type" dense :options="typeOptions" map-options @update:modelValue="updateType" />
+          <q-input v-if="['custom_reps', 'custom_seconds'].includes(data.type)" :rules="[(v: string) => !!v]" lazy-rules="ondemand" label="Exercise Name" outlined v-model="data.label" dense />
+          <q-input class="col" :label="quantityLabel" :rules="[(v: number) => v >= 1]" lazy-rules="ondemand" outlined v-model.number="data.quantity" dense />
         </div>
 
         <q-card-actions align="around">
@@ -27,9 +19,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { useDialogPluginComponent } from 'quasar';
-import { alphabet, typeOptions, unitOptions, type Workout } from 'stores/alphabetStore';
+import { alphabet, typeOptions, type Workout } from 'stores/alphabetStore';
 
 const props = defineProps<{
   index: number;
@@ -46,12 +38,24 @@ const { dialogRef, onDialogHide, onDialogCancel, onDialogOK } = useDialogPluginC
 
 function updateType(type: (typeof typeOptions)[number]) {
   data.value.type = type.value;
-  if (type.value === 'custom') {
+  data.value.unit = type.type;
+  if (['custom_reps', 'custom_seconds'].includes(type.value)) {
     data.value.label = '';
   } else {
     data.value.label = type.label;
   }
 }
+
+const quantityLabel = computed(() => {
+  const matchingExercise = typeOptions.find((tp) => tp.value === data.value.type);
+  if (matchingExercise?.type === 'seconds') {
+    return 'Seconds';
+  } else if (matchingExercise?.type === 'reps') {
+    return 'Reps';
+  } else {
+    return 'Amount';
+  }
+});
 
 function save() {
   onDialogOK(data.value);
