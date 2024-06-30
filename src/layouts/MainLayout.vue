@@ -10,12 +10,15 @@
 
     <q-page-container>
       <q-page>
-        <div class="absolute-center column q-gutter-y-lg">
+        <div class="absolute-center column no-wrap full-width q-px-xl q-gutter-y-lg">
           <template v-if="setupCompleted">
-            <div class="text-subtitle1 text-center">Enter a Word for your Workout</div>
+            <div class="text-h6 text-center">Enter a Word or Phrase for your Workout:</div>
             <q-input autofocus input-class="text-center text-uppercase" outlined v-model="workoutWord" @keypress="checkKeyPress" />
-            <q-btn color="secondary" label="Random Word" @click="randomizeWord" />
             <q-btn color="accent" label="Begin Workout" :disable="!workoutWord.trim()" @click="startWorkout" />
+
+            <div class="q-mt-xl q-pt-xl text-subtitle1 text-center">Or, Generate a Random Word:</div>
+            <q-range v-model="randomRange" :min="5" :max="12" markers :marker-labels="objMarkerLabels" snap label-always color="primary" />
+            <q-btn color="secondary" label="Random Word" @click="randomizeWord" />
           </template>
           <template v-else>
             <div class="text-subtitle1 text-center">Setup your workout plan before you can begin</div>
@@ -37,6 +40,7 @@ import { generate } from 'random-words';
 
 const alphabetStore = useAlphabetStore();
 const workoutWord = ref('');
+const randomRange = ref({ min: 7, max: 10 });
 
 function configure() {
   Dialog.create({
@@ -56,11 +60,13 @@ function startWorkout() {
 function randomizeWord() {
   workoutWord.value = generate({
     exactly: 1,
-    minLength: 7,
-    maxLength: 10,
+    minLength: randomRange.value.min,
+    maxLength: randomRange.value.max,
     formatter: (word) => word.toUpperCase(),
   })[0];
 }
+
+const objMarkerLabels = { 5: '5', 12: '12' };
 
 const setupCompleted = computed(() => {
   return alphabetStore.workouts.every((workout) => !!workout.type);
