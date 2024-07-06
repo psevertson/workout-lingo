@@ -21,6 +21,7 @@
                 <vue-countdown ref="timerRef" class="text-h5" :auto-start="false" :key="step" :time="currentExercise.quantity * 1000" :interval="10" v-slot="{ seconds, milliseconds }" @end="endTimer"> {{ seconds }}.{{ Math.floor(milliseconds / 10).toLocaleString(undefined, { minimumIntegerDigits: 2 }) }}</vue-countdown>
                 <div class="text-h5 q-mt-none">Seconds</div>
                 <q-btn v-if="!timerStarted" color="secondary" label="Start Timer" @click="startTimer" />
+                <q-btn v-else-if="!timerDone" color="secondary" label="Skip" @click="skipTimer" />
               </template>
               <template v-else>
                 <div class="text-h5">{{ currentExercise.quantity }}</div>
@@ -102,6 +103,11 @@ function incrementStep() {
 function startTimer() {
   timerRef.value!.start();
   timerStarted.value = true;
+}
+
+function skipTimer() {
+  timerRef.value!.end();
+  endTimer();
 }
 
 function endTimer() {
