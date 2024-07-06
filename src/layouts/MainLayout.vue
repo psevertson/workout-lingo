@@ -10,7 +10,7 @@
 
     <q-page-container>
       <q-page>
-        <div class="absolute-center column no-wrap full-width q-px-xl q-gutter-y-lg">
+        <div class="absolute-center column no-wrap full-width q-px-xl q-gutter-y-lg" style="text-wrap: balance">
           <template v-if="setupCompleted">
             <div class="text-h6 text-center">Enter a Word or Phrase for your Workout:</div>
             <q-input autofocus input-class="text-center text-uppercase" outlined v-model="workoutWord" @keypress="checkKeyPress" />
