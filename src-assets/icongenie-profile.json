@@ -1,0 +1,14 @@
+{
+  "params": {
+    "skipTrim": true,
+    "icon": "src-assets/icon.png",
+    "padding": [
+      0,
+      0
+    ],
+    "include": [
+      "capacitor"
+    ]
+  },
+  "assets": []
+}
